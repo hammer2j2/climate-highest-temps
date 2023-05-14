@@ -1,0 +1,12 @@
+
+get_last_365_days() {
+  mkdir -p data
+  for i in {1..365}; do monthday=($(date -v -${i}d |awk 's=tolower($2); {print s,$3}')); month=${monthday[6]}; day=${monthday[7]}; a="https://www.extremeweatherwatch.com/cities/portland-or/day/"; echo $month $day $a; done > addr.txt
+  cat addr.txt | while read month day addr; do case $month in jan) m=january;; feb) m=february;;mar) m=march;; apr) m=april;; may) m=may;; jun) m=june;; jul) m=july;; aug) m=august;; sep) m=september;; oct) m=october;; nov) m=november;; dec) m=december;;esac; echo "${month} ${m}-${day} $addr${m}-${day}"; f=data/${m}-${day}.html; curl -so $f $addr${m}-${day} ; sleep 1;  done 
+}
+
+get_stats() {
+  rm hightemps
+  for i in data/*.html; do md=`echo $i| sed 's/data.//;' | awk -F. ' {print $1}'`; egrep -A 2 "Highest temperature"  data/${md}.html| tail -2;done | tee hightemps 
+  perl -ne '/>(\d{4})\<\/td\>/ && print $1,"\n";' hightemps | sort -n | uniq -c
+}
