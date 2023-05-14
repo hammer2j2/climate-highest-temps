@@ -1,0 +1,1 @@
+  508  history  |tail -100 | egrep esac > cmds2
